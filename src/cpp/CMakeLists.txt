@@ -16,7 +16,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/dev/set_sources.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/dev/generate_msvc_libraries.cmake)
 
 # Set source files
-set_sources(
+set(${PROJECT_NAME}_source_files
     log/Log.cpp
     log/StdoutConsumer.cpp
     utils/eClock.cpp 
@@ -100,9 +100,12 @@ set_sources(
     rtps/builtin/data/WriterProxyData.cpp 
     rtps/builtin/data/ReaderProxyData.cpp 
     rtps/flowcontrol/ThroughputController.cpp 
+    rtps/flowcontrol/ThroughputControllerDescriptor.cpp
     rtps/flowcontrol/FlowController.cpp 
-    fastrtps.rc
+    ${PROJECT_SOURCE_DIR}/thirdparty/tinyxml2/tinyxml2.cpp
     )
+
+set_sources(${${PROJECT_NAME}_source_files})
 
 # Set version
 set(${PROJECT_NAME_UPPER}_VERSION_MAJOR ${PROJECT_MAJOR_VERSION})
@@ -121,10 +124,17 @@ if(WIN32)
 endif()
 # If INTERNAL_DEBUG = ON, define symbol for extensive debug messages
 if(INTERNAL_DEBUG)
-	add_definitions(-D__INTERNALDEBUG)
+    add_definitions(-D__INTERNALDEBUG)
 endif()
-# Include Boost header files.
-include_directories(${Boost_INCLUDE_DIR})
+
+set(${PROJECT_NAME}_include_dirs
+    ${PROJECT_SOURCE_DIR}/thirdparty/asio/asio/include
+    ${PROJECT_SOURCE_DIR}/thirdparty/tinyxml2
+)
+
+find_package(Threads REQUIRED)
+
+include_directories(${${PROJECT_NAME}_include_dirs})
 
 # Create libraries
 if(MSVC OR MSVC_IDE)
@@ -145,8 +155,7 @@ if(MSVC OR MSVC_IDE)
         set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES DEBUG_POSTFIX d-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
 
         # Export symbols in DLL library
-        target_compile_definitions(${PROJECT_NAME} PUBLIC BOOST_ALL_DYN_LINK ${PROJECT_NAME_UPPER}_DYN_LINK)
-        target_compile_definitions(${PROJECT_NAME}_static PUBLIC BOOST_ALL_DYN_LINK)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_NAME_UPPER}_DYN_LINK)
 
         # Define public headers
         target_include_directories(${PROJECT_NAME} PUBLIC
@@ -166,9 +175,9 @@ if(MSVC OR MSVC_IDE)
             set(PRIVACY "PRIVATE")
         endif()
 
-        # Link library to external win32 libraries and boost.
+        # Link library to external win32 libraries.
         target_link_libraries(${PROJECT_NAME} ${PRIVACY}
-            ${Boost_LIBRARIES} iphlpapi Shlwapi
+            ${CMAKE_THREAD_LIBS_INIT} iphlpapi Shlwapi kernel32 user32.dll
             )
     endif()
 else()
@@ -186,7 +195,7 @@ else()
 
     # Link library to external libraries.
     target_link_libraries(${PROJECT_NAME}
-        ${Boost_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
         )
 endif()
 

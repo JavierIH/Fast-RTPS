@@ -22,15 +22,14 @@
 #define RESOURCESENDIMPL_H_
 #ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
 
-#include <boost/asio.hpp>
-#include <boost/asio/ip/address_v4.hpp>
-#include <boost/asio/ip/address_v6.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/ip/udp.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/lockable_adapter.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/recursive_mutex.hpp>
+#include <asio.hpp>
+#include <asio/ip/address_v4.hpp>
+#include <asio/ip/address_v6.hpp>
+#include <asio/ip/tcp.hpp>
+#include <asio/ip/udp.hpp>
+
+#include <thread>
+#include <mutex>
 
 #include <fastrtps/rtps/common/Locator.h>
 
@@ -78,18 +77,18 @@ public:
 	* Get associated mutex
 	* @return Associated mutex
 	*/
-	boost::recursive_mutex* getMutex();
+	std::recursive_mutex* getMutex();
 private:
 	bool m_useIP4;
 	bool m_useIP6;
 	std::vector<Locator_t> mv_sendLocator_v4;
 	std::vector<Locator_t> mv_sendLocator_v6;
-	boost::asio::io_service m_send_service;
-	std::vector<boost::asio::ip::udp::socket*> mv_send_socket_v4;
-	std::vector<boost::asio::ip::udp::socket*> mv_send_socket_v6;
+	asio::io_service m_send_service;
+	std::vector<asio::ip::udp::socket*> mv_send_socket_v4;
+	std::vector<asio::ip::udp::socket*> mv_send_socket_v6;
 	size_t m_bytes_sent;
 	bool m_send_next;
-	boost::recursive_mutex* mp_mutex;
+	std::recursive_mutex* mp_mutex;
 
 };
 }

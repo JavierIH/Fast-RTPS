@@ -17,6 +17,8 @@
  *
  */
 
+#include <mutex>
+
 #include <fastrtps/rtps/writer/RTPSWriter.h>
 #include <fastrtps/rtps/reader/RTPSReader.h>
 
@@ -54,7 +56,7 @@ ListenResource::~ListenResource() {
 
 bool ListenResource::removeAssociatedEndpoint(Endpoint* endp)
 {
-	boost::lock_guard<boost::mutex> guard(*this->getMutex());
+	std::lock_guard<std::mutex> guard(*this->getMutex());
 	if(endp->getAttributes()->endpointKind == WRITER)
 	{
 		for(auto wit = m_assocWriters.begin();
@@ -83,7 +85,7 @@ bool ListenResource::removeAssociatedEndpoint(Endpoint* endp)
 
 bool ListenResource::addAssociatedEndpoint(Endpoint* endp)
 {
-	boost::lock_guard<boost::mutex> guard(*mp_impl->getMutex());
+	std::lock_guard<std::mutex> guard(*mp_impl->getMutex());
 	bool found = false;
 	if(endp->getAttributes()->endpointKind == WRITER)
 	{
@@ -153,7 +155,7 @@ const LocatorList_t& ListenResource::getListenLocators()
 	return mp_impl->getListenLocators();
 }
 
-boost::mutex* ListenResource::getMutex(){return mp_impl->getMutex();}
+std::mutex* ListenResource::getMutex(){return mp_impl->getMutex();}
 
 
 

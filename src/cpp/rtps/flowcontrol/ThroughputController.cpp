@@ -13,11 +13,12 @@
 // limitations under the License.
 
 #include <fastrtps/rtps/flowcontrol/ThroughputController.h>
+#include <fastrtps/rtps/flowcontrol/ThroughputControllerDescriptor.h>
 #include <fastrtps/rtps/resources/AsyncWriterThread.h>
-#include <boost/asio.hpp>
+#include <asio.hpp>
 
 using namespace std;
-using namespace boost::asio;
+using namespace asio;
 
 namespace eprosima{
 namespace fastrtps{
@@ -38,14 +39,6 @@ ThroughputController::ThroughputController(const ThroughputControllerDescriptor&
     mPeriodMillisecs(descriptor.periodMillisecs),
     mAssociatedParticipant(associatedParticipant),
     mAssociatedWriter(nullptr)
-{
-}
-
-ThroughputControllerDescriptor::ThroughputControllerDescriptor(): bytesPerPeriod(UINT32_MAX), periodMillisecs(0)
-{
-}
-
-ThroughputControllerDescriptor::ThroughputControllerDescriptor(uint32_t size, uint32_t time): bytesPerPeriod(size), periodMillisecs(time)
 {
 }
 
@@ -99,11 +92,11 @@ void ThroughputController::operator()(vector<CacheChangeForGroup_t>& changes)
 
 void ThroughputController::ScheduleRefresh(uint32_t sizeToRestore)
 {
-    shared_ptr<deadline_timer> throwawayTimer(make_shared<deadline_timer>(*FlowController::ControllerService));
+    shared_ptr<steady_timer> throwawayTimer(make_shared<steady_timer>(*FlowController::ControllerService));
     auto refresh = [throwawayTimer, this, sizeToRestore]
-        (const boost::system::error_code& error)
+        (const asio::error_code& error)
         {
-            if ((error != boost::asio::error::operation_aborted) &&
+            if ((error != asio::error::operation_aborted) &&
                     FlowController::IsListening(this))
             {
                 std::unique_lock<std::recursive_mutex> scopedLock(mThroughputControllerMutex);
@@ -117,7 +110,7 @@ void ThroughputController::ScheduleRefresh(uint32_t sizeToRestore)
             }
         };
 
-    throwawayTimer->expires_from_now(boost::posix_time::milliseconds(mPeriodMillisecs));
+    throwawayTimer->expires_from_now(std::chrono::milliseconds(mPeriodMillisecs));
     throwawayTimer->async_wait(refresh);
 }
 

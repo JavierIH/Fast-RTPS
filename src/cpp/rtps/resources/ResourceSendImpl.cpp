@@ -23,7 +23,7 @@
 
 #include <fastrtps/utils/IPFinder.h>
 
-using boost::asio::ip::udp;
+using asio::ip::udp;
 
 namespace eprosima {
 namespace fastrtps{
@@ -39,7 +39,7 @@ ResourceSendImpl::ResourceSendImpl() :
 										//m_send_socket_v6(m_send_service),
 										m_bytes_sent(0),
 										m_send_next(true),
-										mp_mutex(new boost::recursive_mutex())
+										mp_mutex(new std::recursive_mutex())
 {
 
 }
@@ -51,7 +51,7 @@ bool ResourceSendImpl::initSend(RTPSParticipantImpl* /*pimpl*/, const Locator_t&
 
 	std::vector<IPFinder::info_IP> locNames;
 	IPFinder::getIPs(&locNames);
-	boost::asio::socket_base::send_buffer_size option;
+	asio::socket_base::send_buffer_size option;
 	bool not_bind = true;
 	bool initialized = false;
 	int bind_tries = 0;
@@ -63,23 +63,23 @@ bool ResourceSendImpl::initSend(RTPSParticipantImpl* /*pimpl*/, const Locator_t&
 			auto sendLocv4 = mv_sendLocator_v4.back();
 			sendLocv4.port = loc.port;
 			//OPEN SOCKETS:
-			mv_send_socket_v4.push_back(new boost::asio::ip::udp::socket(m_send_service));
+			mv_send_socket_v4.push_back(new asio::ip::udp::socket(m_send_service));
 			auto sendSocketv4 = mv_send_socket_v4.back();
-			sendSocketv4->open(boost::asio::ip::udp::v4());
-			sendSocketv4->set_option(boost::asio::socket_base::send_buffer_size(sendsockBuffer));
+			sendSocketv4->open(asio::ip::udp::v4());
+			sendSocketv4->set_option(asio::socket_base::send_buffer_size(sendsockBuffer));
 			bind_tries = 0;
 			udp::endpoint send_endpoint;
 			while (not_bind && bind_tries < MAX_BIND_TRIES)
 			{
-				send_endpoint = udp::endpoint(boost::asio::ip::address_v4::from_string(ipit->name), (uint16_t)sendLocv4.port);
+				send_endpoint = udp::endpoint(asio::ip::address_v4::from_string(ipit->name), (uint16_t)sendLocv4.port);
 				try{
 					sendSocketv4->bind(send_endpoint);
 					not_bind = false;
 				}
 				#pragma warning(disable:4101)
-				catch (boost::system::system_error const& e)
+				catch (std::system_error const& e)
 				{
-					logInfo(RTPS_MSG_OUT, "UDPv4 Error binding endpoint: (" << send_endpoint << ")" << " with boost msg: "<<e.what() );
+					logInfo(RTPS_MSG_OUT, "UDPv4 Error binding endpoint: (" << send_endpoint << ")" << " with msg: "<<e.message() );
 					sendLocv4.port++;
 				}
 				++bind_tries;
@@ -107,18 +107,18 @@ bool ResourceSendImpl::initSend(RTPSParticipantImpl* /*pimpl*/, const Locator_t&
 			auto sendLocv6 = mv_sendLocator_v6.back();
 			sendLocv6.port = loc.port;
 			//OPEN SOCKETS:
-			mv_send_socket_v6.push_back(new boost::asio::ip::udp::socket(m_send_service));
+			mv_send_socket_v6.push_back(new asio::ip::udp::socket(m_send_service));
 			auto sendSocketv6 = mv_send_socket_v6.back();
-			sendSocketv6->open(boost::asio::ip::udp::v6());
-			sendSocketv6->set_option(boost::asio::socket_base::send_buffer_size(sendsockBuffer));
+			sendSocketv6->open(asio::ip::udp::v6());
+			sendSocketv6->set_option(asio::socket_base::send_buffer_size(sendsockBuffer));
 			bind_tries = 0;
 			udp::endpoint send_endpoint;
 			while (not_bind && bind_tries < MAX_BIND_TRIES)
 			{
-				boost::asio::ip::address_v6::bytes_type bt;
+				asio::ip::address_v6::bytes_type bt;
 				for (uint8_t i = 0; i < 16;++i)
 					bt[i] = ipit->locator.address[i];
-				boost::asio::ip::address_v6 addr = boost::asio::ip::address_v6(bt);
+				asio::ip::address_v6 addr = asio::ip::address_v6(bt);
 				addr.scope_id(ipit->scope_id);
 				send_endpoint = udp::endpoint(addr, (uint16_t)sendLocv6.port);
 				//cout << "IP6 ADDRESS: "<< send_endpoint << endl;
@@ -127,9 +127,9 @@ bool ResourceSendImpl::initSend(RTPSParticipantImpl* /*pimpl*/, const Locator_t&
 					not_bind = false;
 				}
                 #pragma warning(disable:4101)
-				catch (boost::system::system_error const& e)
+				catch (std::system_error const& e)
 				{
-					logInfo(RTPS_MSG_OUT, "UDPv6 Error binding endpoint: (" << send_endpoint << ")"<< " with boost msg: "<<e.what() );
+					logInfo(RTPS_MSG_OUT, "UDPv6 Error binding endpoint: (" << send_endpoint << ")"<< " with msg: "<<e.message() );
 					sendLocv6.port++;
 				}
 				++bind_tries;
@@ -173,15 +173,15 @@ ResourceSendImpl::~ResourceSendImpl()
 
 void ResourceSendImpl::sendSync(CDRMessage_t* msg, const Locator_t& loc)
 {
-	boost::lock_guard<boost::recursive_mutex> guard(*this->mp_mutex);
+	std::lock_guard<std::recursive_mutex> guard(*this->mp_mutex);
 	if(loc.port == 0)
 		return;
 	if(loc.kind == LOCATOR_KIND_UDPv4 && m_useIP4)
 	{
-		boost::asio::ip::address_v4::bytes_type addr;
+		asio::ip::address_v4::bytes_type addr;
 		for(uint8_t i = 0; i < 4; ++i)
 			addr[i] = loc.address[12 + i];
-        boost::asio::ip::udp::endpoint send_endpoint_v4 = udp::endpoint(boost::asio::ip::address_v4(addr), (uint16_t)loc.port);
+        asio::ip::udp::endpoint send_endpoint_v4 = udp::endpoint(asio::ip::address_v4(addr), (uint16_t)loc.port);
 		for (auto sockit = mv_send_socket_v4.begin(); sockit != mv_send_socket_v4.end(); ++sockit)
 		{
 			logInfo(RTPS_MSG_OUT,"UDPv4: " << msg->length << " bytes TO endpoint: " << send_endpoint_v4
@@ -192,7 +192,7 @@ void ResourceSendImpl::sendSync(CDRMessage_t* msg, const Locator_t& loc)
 				if(m_send_next)
 				{
 					try {
-						m_bytes_sent = (*sockit)->send_to(boost::asio::buffer((void*)msg->buffer, msg->length), send_endpoint_v4);
+						m_bytes_sent = (*sockit)->send_to(asio::buffer((void*)msg->buffer, msg->length), send_endpoint_v4);
 					}
 					catch (const std::exception& error) {
 						// Should print the actual error message
@@ -212,10 +212,10 @@ void ResourceSendImpl::sendSync(CDRMessage_t* msg, const Locator_t& loc)
 	}
 	else if(loc.kind == LOCATOR_KIND_UDPv6 && m_useIP6)
 	{
-		boost::asio::ip::address_v6::bytes_type addr;
+		asio::ip::address_v6::bytes_type addr;
 		for(uint8_t i = 0; i < 16; i++)
 			addr[i] = loc.address[i];
-        boost::asio::ip::udp::endpoint send_endpoint_v6 = udp::endpoint(boost::asio::ip::address_v6(addr), (uint16_t)loc.port);
+        asio::ip::udp::endpoint send_endpoint_v6 = udp::endpoint(asio::ip::address_v6(addr), (uint16_t)loc.port);
 		for (auto sockit = mv_send_socket_v6.begin(); sockit != mv_send_socket_v6.end(); ++sockit)
 		{
 			logInfo(RTPS_MSG_OUT, "UDPv6: " << msg->length << " bytes TO endpoint: "
@@ -226,7 +226,7 @@ void ResourceSendImpl::sendSync(CDRMessage_t* msg, const Locator_t& loc)
 				if (m_send_next)
 				{
 					try {
-						m_bytes_sent = (*sockit)->send_to(boost::asio::buffer((void*)msg->buffer, msg->length), send_endpoint_v6);
+						m_bytes_sent = (*sockit)->send_to(asio::buffer((void*)msg->buffer, msg->length), send_endpoint_v6);
 					}
 					catch (const std::exception& error) {
 						// Should print the actual error message
@@ -251,7 +251,7 @@ void ResourceSendImpl::sendSync(CDRMessage_t* msg, const Locator_t& loc)
 
 }
 
-boost::recursive_mutex* ResourceSendImpl::getMutex() {return mp_mutex;}
+std::recursive_mutex* ResourceSendImpl::getMutex() {return mp_mutex;}
 
 }
 } /* namespace rtps */

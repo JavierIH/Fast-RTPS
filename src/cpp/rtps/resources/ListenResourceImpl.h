@@ -25,10 +25,13 @@
 #include <fastrtps/rtps/common/Locator.h>
 
 
-#include <boost/asio.hpp>
-#include <boost/asio/ip/udp.hpp>
+#include <asio.hpp>
+#include <asio/ip/udp.hpp>
 
-#include <boost/thread.hpp>
+#include <system_error>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 namespace eprosima {
 namespace fastrtps{
@@ -74,7 +77,7 @@ public:
 	* Get the mutex
 	* @return Associated mutex
 	*/
-	inline boost::mutex* getMutex() {return &mutex_;};
+	inline std::mutex* getMutex() {return &mutex_;};
 
 	/**
 	* Get the listen locators
@@ -85,14 +88,14 @@ public:
 	private:
 	RTPSParticipantImpl* mp_RTPSParticipantImpl;
 	ListenResource* mp_listenResource;
-	boost::thread* mp_thread;
-	boost::asio::io_service m_io_service;
-	boost::asio::ip::udp::socket m_listen_socket;
-	boost::asio::ip::udp::endpoint m_sender_endpoint;
-	boost::asio::ip::udp::endpoint m_listen_endpoint;
+	std::thread* mp_thread;
+	asio::io_service m_io_service;
+	asio::ip::udp::socket m_listen_socket;
+	asio::ip::udp::endpoint m_sender_endpoint;
+	asio::ip::udp::endpoint m_listen_endpoint;
 
 	void getLocatorAddresses(Locator_t& loc, bool isMulti);
-	void joinMulticastGroup(boost::asio::ip::address& addr);
+	void joinMulticastGroup(asio::ip::address& addr);
 	LocatorList_t mv_listenLoc;
 	Locator_t m_senderLocator;
 
@@ -105,13 +108,13 @@ public:
 	 * @param error Error code associated with the operation.
 	 * @param size NUmber of bytes received
 	 */
-	void newCDRMessage(const boost::system::error_code& error, std::size_t size);
+	void newCDRMessage(const std::error_code& error, std::size_t size);
 
 	//! Method to run the io_service.
 	void run_io_service();
 
-	boost::mutex mutex_;
-	boost::condition_variable cond_;
+	std::mutex mutex_;
+	std::condition_variable cond_;
     bool runningAsync_;
     bool stopped_;
 

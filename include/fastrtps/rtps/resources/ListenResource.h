@@ -22,11 +22,8 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
 #include <vector>
 #include <cstdlib>
+#include <mutex>
 
-namespace boost
-{
-    class mutex;
-}
 
 namespace eprosima {
 namespace fastrtps{
@@ -115,7 +112,7 @@ public:
 	RTPSParticipantImpl* mp_RTPSParticipantImpl;
 
 	//!Get the associated Mutex
-	boost::mutex* getMutex();
+	std::mutex* getMutex();
 
 	const uint32_t m_ID;
 

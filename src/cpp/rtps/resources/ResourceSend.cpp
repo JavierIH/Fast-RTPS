@@ -17,6 +17,8 @@
  *
  */
 
+#include <mutex>
+
 #include <fastrtps/rtps/resources/ResourceSend.h>
 #include "ResourceSendImpl.h"
 #include "../participant/RTPSParticipantImpl.h"
@@ -48,7 +50,7 @@ void ResourceSend::sendSync(CDRMessage_t* msg, const Locator_t& loc)
 	return mp_impl->sendSync(msg,loc);
 }
 
-boost::recursive_mutex* ResourceSend::getMutex()
+std::recursive_mutex* ResourceSend::getMutex()
 {
 	return mp_impl->getMutex();
 }

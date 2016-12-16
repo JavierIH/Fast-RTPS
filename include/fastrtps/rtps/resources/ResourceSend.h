@@ -21,11 +21,7 @@
 #define RESOURCESEND_H_
 #ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
 #include <cstdint>
-
-namespace boost
-{
-class recursive_mutex;
-}
+#include <mutex>
 
 namespace eprosima {
 namespace fastrtps{
@@ -69,7 +65,7 @@ public:
 	* Get associated mutex
 	* @return Associated mutex
 	*/
-	boost::recursive_mutex* getMutex();
+	std::recursive_mutex* getMutex();
 
 	void loose_next_change();
 

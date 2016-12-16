@@ -99,8 +99,13 @@ if(MSVC OR MSVC_IDE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
     endif()
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -Wno-unknown-pragmas")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -Wno-unknown-pragmas -std=c++11")
 endif()
+
+add_definitions(
+  -DBOOST_ASIO_STANDALONE
+  -DASIO_STANDALONE
+)
 
 ###############################################################################
 # GCC colors if using CCache
@@ -166,26 +171,6 @@ if(EPROSIMA_BUILD AND NOT EPROSIMA_INSTALLER_MINION)
 endif()
 
 ###############################################################################
-# Performance tests
-###############################################################################
-option(PERFORMANCE_TESTS "Activate the building and execution of performance tests" OFF)
-
-###############################################################################
-# Load CMake modules
-###############################################################################
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/modules)
-
-###############################################################################
-# Check libraries
-###############################################################################
-include(${PROJECT_SOURCE_DIR}/cmake/dev/boost_libraries.cmake)
-set(BOOST_LIBRARIES_DEFAULT thread system date_time chrono regex atomic)
-if(PERFORMANCE_TESTS)
-    set(BOOST_LIBRARIES_DEFAULT ${BOOST_LIBRARIES_DEFAULT} program_options)
-endif()
-check_boost(${BOOST_LIBRARIES_DEFAULT})
-
-###############################################################################
 # Load external eProsima projects.
 ###############################################################################
 option(THIRDPARTY "Activate the use of internal thirdparties" OFF)
@@ -224,7 +209,7 @@ add_subdirectory(src/cpp)
 ###############################################################################
 # Testing
 ###############################################################################
-if(NOT EPROSIMA_INSTALLER AND NOT EPROSIMA_INSTALLER_MINION)
+if(EPROSIMA_BUILD_TESTS AND NOT EPROSIMA_INSTALLER AND NOT EPROSIMA_INSTALLER_MINION)
     enable_testing()
     include(CTest)
     add_subdirectory(test)
@@ -345,7 +330,6 @@ endif()
 ###############################################################################
 # Install external eprosima libraries
 install_eprosima_libraries()
-install_boost(ALL thread system date_time chrono regex atomic)
 
 # Install licenses
 install(FILES ${PROJECT_SOURCE_DIR}/LICENSE

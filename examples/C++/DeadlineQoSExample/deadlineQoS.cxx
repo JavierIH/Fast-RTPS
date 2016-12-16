@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <chrono>
+#include <thread>
+
 #include "deadlineQoS.h"
 #include <string>
 
-using namespace boost:: asio;
+using namespace asio;
 using namespace eprosima;
 using namespace eprosima::fastrtps;
 
@@ -41,8 +44,8 @@ void deadlineQoS::callback()
 
 void deadlineQoS::wait()
 {
-	 t.expires_from_now(boost::posix_time::seconds(1)); //repeat rate here
-     t.async_wait(boost::bind(&deadlineQoS::callback, this));
+	 t.expires_from_now(std::chrono::seconds(1)); //repeat rate here
+     t.async_wait(std::bind(&deadlineQoS::callback, this));
 }
 
 void deadlineQoS::setFlag(mapable_key target)
@@ -80,7 +83,7 @@ void deadlineQoS::runner(){
 }
 
 void deadlineQoS::run(){
-		boost::thread dlqos(boost::bind(&deadlineQoS::runner,this));
+		std::thread dlqos(std::bind(&deadlineQoS::runner,this));
 }
 
 void deadlineQoS::stop(){
