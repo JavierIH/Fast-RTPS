@@ -21,20 +21,23 @@
 #include <memory>
 #include <fastrtps/rtps/common/CacheChange.h>
 #include <fastrtps/rtps/messages/RTPSMessageGroup.h>
-#include <asio.hpp>
 #include <thread>
 
+namespace asio{
+    class io_context;
+    typedef io_context io_service;
+}
 namespace eprosima{
 namespace fastrtps{
 namespace rtps{
 
 /**
  * Flow Controllers take a vector of cache changes (by reference) and return a filtered
- * vector, with a collection of changes this filter considers valid for sending, 
+ * vector, with a collection of changes this filter considers valid for sending,
  * ordered by its subjective priority.
  * @ingroup NETWORK_MODULE.
  * */
-class FlowController 
+class FlowController
 {
 public:
    //! Called when a change is finally dispatched.
