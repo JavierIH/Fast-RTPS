@@ -34,7 +34,7 @@ static const uint8_t defaultTTL = 1;
 static void GetIP4s(vector<IPFinder::info_IP>& locNames, bool return_loopback = false)
 {
     IPFinder::getIPs(&locNames, return_loopback);
-    auto newEnd = remove_if(locNames.begin(), 
+    auto newEnd = remove_if(locNames.begin(),
             locNames.end(),
             [](IPFinder::info_IP ip){return ip.type != IPFinder::IP4 && ip.type != IPFinder::IP4_LOCAL;});
     locNames.erase(newEnd, locNames.end());
@@ -137,7 +137,7 @@ bool UDPv4Transport::OpenOutputChannel(Locator_t& locator)
 {
     if (IsOutputChannelOpen(locator) ||
             !IsLocatorSupported(locator))
-        return false;   
+        return false;
 
     return OpenAndBindOutputSockets(locator);
 }
@@ -151,7 +151,7 @@ bool UDPv4Transport::OpenInputChannel(const Locator_t& locator)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
     if (!IsLocatorSupported(locator))
-        return false;   
+        return false;
 
     bool success = false;
 
@@ -184,7 +184,7 @@ bool UDPv4Transport::CloseOutputChannel(const Locator_t& locator)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mOutputMapMutex);
     if (!IsOutputChannelOpen(locator))
-        return false;   
+        return false;
 
     auto& sockets = mOutputSockets.at(locator.port);
     for (auto& socket : sockets)
@@ -207,7 +207,7 @@ bool UDPv4Transport::CloseInputChannel(const Locator_t& locator)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
     if (!IsInputChannelOpen(locator))
-        return false;   
+        return false;
 
 
     auto& socket = mInputSockets.at(locator.port);
@@ -238,7 +238,7 @@ bool UDPv4Transport::OpenAndBindOutputSockets(Locator_t& locator)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mOutputMapMutex);
 
-    try 
+    try
     {
         if(IsAny(locator))
         {
@@ -352,14 +352,14 @@ bool UDPv4Transport::OpenAndBindInputSockets(uint32_t port, bool is_multicast)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
 
-    try 
+    try
     {
         mInputSockets.emplace(port, OpenAndBindInputSocket(port, is_multicast));
     }
     catch (asio::system_error const& e)
     {
         (void)e;
-        logInfo(RTPS_MSG_OUT, "UDPv4 Error binding at port: (" << port << ")" << " with msg: "<<e.message());
+        logInfo(RTPS_MSG_OUT, "UDPv4 Error binding at port: (" << port << ")" << " with msg: "<<e.what());
         mInputSockets.erase(port);
         return false;
     }
@@ -493,7 +493,7 @@ bool UDPv4Transport::Receive(octet* receiveBuffer, uint32_t receiveBufferCapacit
                 logInfo(RTPS_MSG_IN, "Error while listening to socket...");
                 receiveBufferSize = 0;
             }
-            else 
+            else
             {
                 logInfo(RTPS_MSG_IN,"Msg processed (" << bytes_transferred << " bytes received), Socket async receive put again to listen ");
                 receiveBufferSize = static_cast<uint32_t>(bytes_transferred);
@@ -559,7 +559,7 @@ bool UDPv4Transport::SendThroughSocket(const octet* sendBuffer,
         bytesSent = socket->send_to(asio::buffer(sendBuffer, sendBufferSize), destinationEndpoint);
 #endif
     }
-    catch (const std::exception& error) 
+    catch (const std::exception& error)
     {
         logWarning(RTPS_MSG_OUT, "Error: " << error.what());
         return false;

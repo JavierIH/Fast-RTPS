@@ -35,7 +35,7 @@ static void GetIP6s(vector<IPFinder::info_IP>& locNames, bool return_loopback = 
 {
     IPFinder::getIPs(&locNames, return_loopback);
     // Controller out IP4
-    auto newEnd = remove_if(locNames.begin(), 
+    auto newEnd = remove_if(locNames.begin(),
             locNames.end(),
             [](IPFinder::info_IP ip){return ip.type != IPFinder::IP6 && ip.type != IPFinder::IP6_LOCAL;});
     locNames.erase(newEnd, locNames.end());
@@ -146,7 +146,7 @@ bool UDPv6Transport::OpenOutputChannel(Locator_t& locator)
 {
     if (IsOutputChannelOpen(locator) ||
             !IsLocatorSupported(locator))
-        return false;   
+        return false;
 
     return OpenAndBindOutputSockets(locator);
 }
@@ -160,7 +160,7 @@ bool UDPv6Transport::OpenInputChannel(const Locator_t& locator)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
     if (!IsLocatorSupported(locator))
-        return false;   
+        return false;
 
     bool success = false;
 
@@ -193,7 +193,7 @@ bool UDPv6Transport::CloseOutputChannel(const Locator_t& locator)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mOutputMapMutex);
     if (!IsOutputChannelOpen(locator))
-        return false;   
+        return false;
 
     auto& sockets = mOutputSockets.at(locator.port);
     for (auto& socket : sockets)
@@ -216,7 +216,7 @@ bool UDPv6Transport::CloseInputChannel(const Locator_t& locator)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
     if (!IsInputChannelOpen(locator))
-        return false;   
+        return false;
 
 
     auto& socket = mInputSockets.at(locator.port);
@@ -248,7 +248,7 @@ bool UDPv6Transport::OpenAndBindOutputSockets(Locator_t& locator)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mOutputMapMutex);
 
-    try 
+    try
     {
         if(IsAny(locator))
         {
@@ -350,7 +350,7 @@ bool UDPv6Transport::OpenAndBindOutputSockets(Locator_t& locator)
     catch (asio::error_code const& e)
     {
         (void)e;
-        logInfo(RTPS_MSG_OUT, "UDPv6 Error binding at port: (" << locator.port << ")" << " with msg: "<<e.what());
+        logInfo(RTPS_MSG_OUT, "UDPv6 Error binding at port: (" << locator.port << ")" << " with msg: "<<e.message());
         mOutputSockets.erase(locator.port);
         return false;
     }
@@ -362,7 +362,7 @@ bool UDPv6Transport::OpenAndBindInputSockets(uint32_t port, bool is_multicast)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
 
-    try 
+    try
     {
         mInputSockets.emplace(port, OpenAndBindInputSocket(port, is_multicast));
     }
@@ -508,7 +508,7 @@ bool UDPv6Transport::Receive(octet* receiveBuffer, uint32_t receiveBufferCapacit
             logInfo(RTPS_MSG_IN, "Error while listening to socket...");
             receiveBufferSize = 0;
         }
-        else 
+        else
         {
             logInfo(RTPS_MSG_IN,"Msg processed (" << bytes_transferred << " bytes received), Socket async receive put again to listen ");
             receiveBufferSize = static_cast<uint32_t>(bytes_transferred);
@@ -564,7 +564,7 @@ bool UDPv6Transport::SendThroughSocket(const octet* sendBuffer,
             << " FROM " << socket->local_endpoint());
 #endif
 
-    try 
+    try
     {
 #if defined(ASIO_HAS_MOVE)
         bytesSent = socket.send_to(asio::buffer(sendBuffer, sendBufferSize), destinationEndpoint);
@@ -572,7 +572,7 @@ bool UDPv6Transport::SendThroughSocket(const octet* sendBuffer,
         bytesSent = socket->send_to(asio::buffer(sendBuffer, sendBufferSize), destinationEndpoint);
 #endif
     }
-    catch (const std::exception& error) 
+    catch (const std::exception& error)
     {
         logWarning(RTPS_MSG_OUT, "Error: " << error.what());
         return false;
