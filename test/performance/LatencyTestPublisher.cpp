@@ -99,7 +99,7 @@ bool LatencyTestPublisher::init(int n_sub, int n_sam, bool reliable, uint32_t pi
 
 		switch (*it + 4)
         {
-		case 16: 
+		case 16:
 			output_file_16 << "\"Minimum of " << n_samples << " samples (" << str_reliable << ")\",";
 			output_file_16 << "\"Average of " << n_samples << " samples (" << str_reliable << ")\"" << std::endl;
 			break;
@@ -183,7 +183,7 @@ bool LatencyTestPublisher::init(int n_sub, int n_sam, bool reliable, uint32_t pi
     std::ostringstream pt;
     pt << "LatencyTest_";
     if(hostname)
-        pt << boost::asio::ip::host_name() << "_";
+        pt << asio::ip::host_name() << "_";
     pt << pid << "_PUB2SUB";
     PubDataparam.topic.topicName = pt.str();
 	PubDataparam.topic.historyQos.kind = KEEP_ALL_HISTORY_QOS;
@@ -207,7 +207,7 @@ bool LatencyTestPublisher::init(int n_sub, int n_sam, bool reliable, uint32_t pi
     std::ostringstream st;
     st << "LatencyTest_";
     if(hostname)
-        st << boost::asio::ip::host_name() << "_";
+        st << asio::ip::host_name() << "_";
     st << pid << "_SUB2PUB";
     SubDataparam.topic.topicName = st.str();
 	SubDataparam.topic.historyQos.kind = KEEP_LAST_HISTORY_QOS;
@@ -229,7 +229,7 @@ bool LatencyTestPublisher::init(int n_sub, int n_sam, bool reliable, uint32_t pi
     std::ostringstream pct;
     pct << "LatencyTest_Command_";
     if(hostname)
-        pct << boost::asio::ip::host_name() << "_";
+        pct << asio::ip::host_name() << "_";
     pct << pid << "_PUB2SUB";
     PubCommandParam.topic.topicName = pct.str();
 	PubCommandParam.topic.historyQos.kind = KEEP_ALL_HISTORY_QOS;
@@ -246,7 +246,7 @@ bool LatencyTestPublisher::init(int n_sub, int n_sam, bool reliable, uint32_t pi
     std::ostringstream sct;
     sct << "LatencyTest_Command_";
     if(hostname)
-        sct << boost::asio::ip::host_name() << "_";
+        sct << asio::ip::host_name() << "_";
     sct << pid << "_SUB2PUB";
     SubCommandParam.topic.topicName = sct.str();
 	SubCommandParam.topic.historyQos.kind = KEEP_ALL_HISTORY_QOS;
@@ -509,12 +509,12 @@ bool LatencyTestPublisher::test(uint32_t datasize)
     lock.unlock();
 	//cout << endl;
 	//BEGIN THE TEST:
-    
+
     for(unsigned int count = 1; count <= n_samples; ++count)
     {
         mp_latency_in->seqnum = 0;
         mp_latency_out->seqnum = count;
-        
+
         t_start_ = std::chrono::steady_clock::now();
         mp_datapub->write((void*)mp_latency_out);
 

@@ -18,6 +18,8 @@ if(NOT ((MSVC OR MSVC_IDE) AND EPROSIMA_INSTALLER) AND fastcdr_FOUND)
         find_package(PythonInterp 3 REQUIRED)
         find_package(Boost COMPONENTS program_options)
 
+        include_directories(${PROJECT_SOURCE_DIR}/thirdparty/asio/asio/include)
+
         ###############################################################################
         # Binaries
         ###############################################################################
@@ -44,7 +46,7 @@ if(NOT ((MSVC OR MSVC_IDE) AND EPROSIMA_INSTALLER) AND fastcdr_FOUND)
         if(PYTHONINTERP_FOUND)
             ###############################################################################
             # LatencyTest
-            ###############################################################################	
+            ###############################################################################
             if(Boost_PROGRAM_OPTIONS_FOUND)
                 add_test(NAME LatencyTest
                     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/latency_tests.py)

@@ -22,14 +22,16 @@ if(NOT ((MSVC OR MSVC_IDE) AND EPROSIMA_INSTALLER))
         endif()
 
         include_directories(mock/)
+        include_directories(${PROJECT_SOURCE_DIR}/thirdparty/asio/asio/include)
 
-        set(THROUGHPUTCONTROLLERTESTS_SOURCE 
-            ThroughputControllerTests.cpp 
+        set(THROUGHPUTCONTROLLERTESTS_SOURCE
+            ThroughputControllerTests.cpp
             mock/mock.RTPSParticipantImpl.cpp
             ${PROJECT_SOURCE_DIR}/src/cpp/rtps/resources/AsyncWriterThread.cpp
             ${PROJECT_SOURCE_DIR}/src/cpp/rtps/resources/AsyncInterestTree.cpp
             ${PROJECT_SOURCE_DIR}/src/cpp/rtps/flowcontrol/FlowController.cpp
-            ${PROJECT_SOURCE_DIR}/src/cpp/rtps/flowcontrol/ThroughputController.cpp)
+            ${PROJECT_SOURCE_DIR}/src/cpp/rtps/flowcontrol/ThroughputController.cpp
+            ${PROJECT_SOURCE_DIR}/src/cpp/rtps/flowcontrol/ThroughputControllerDescriptor.cpp)
 
         add_executable(ThroughputControllerTests ${THROUGHPUTCONTROLLERTESTS_SOURCE})
         add_gtest(ThroughputControllerTests ${THROUGHPUTCONTROLLERTESTS_SOURCE})

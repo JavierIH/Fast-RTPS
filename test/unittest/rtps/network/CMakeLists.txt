@@ -23,8 +23,10 @@ if(NOT ((MSVC OR MSVC_IDE) AND EPROSIMA_INSTALLER))
             add_definitions(-D_WIN32_WINNT=0x0601)
         endif()
 
-        set(NETWORKFACTORYTESTS_SOURCE 
-            NetworkFactoryTests.cpp 
+        include_directories(${PROJECT_SOURCE_DIR}/thirdparty/asio/asio/include)
+
+        set(NETWORKFACTORYTESTS_SOURCE
+            NetworkFactoryTests.cpp
             mock/MockTransport.cpp
             ${PROJECT_SOURCE_DIR}/src/cpp/rtps/network/NetworkFactory.cpp
             ${PROJECT_SOURCE_DIR}/src/cpp/rtps/network/ReceiverResource.cpp

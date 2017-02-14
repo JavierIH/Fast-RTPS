@@ -177,6 +177,18 @@ if(EPROSIMA_BUILD AND NOT EPROSIMA_INSTALLER_MINION)
 	set(INTERNAL_DEBUG ON)
 endif()
 
+
+###############################################################################
+# Performance tests
+###############################################################################
+option(PERFORMANCE_TESTS "Activate the building and execution of performance tests" OFF)
+
+###############################################################################
+# Load CMake modules
+###############################################################################
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/modules)
+
+
 ###############################################################################
 # Default shared libraries
 ###############################################################################
@@ -187,7 +199,7 @@ option(BUILD_SHARED_LIBS
     ON)
 
 ###############################################################################
-# Load external eProsima projects.
+# Load external projects.
 ###############################################################################
 option(THIRDPARTY "Activate the use of internal thirdparties" OFF)
 

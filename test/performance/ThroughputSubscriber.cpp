@@ -248,7 +248,7 @@ ThroughputSubscriber::ThroughputSubscriber(bool reliable, uint32_t pid, bool hos
     std::ostringstream st;
     st << "ThroughputTest_";
     if(hostname)
-        st << boost::asio::ip::host_name() << "_";
+        st << asio::ip::host_name() << "_";
     st << pid << "_UP";
     Sparam.topic.topicName = st.str();
 
@@ -283,7 +283,7 @@ ThroughputSubscriber::ThroughputSubscriber(bool reliable, uint32_t pid, bool hos
     std::ostringstream pct;
     pct << "ThroughputTest_Command_";
     if(hostname)
-        pct << boost::asio::ip::host_name() << "_";
+        pct << asio::ip::host_name() << "_";
     pct << pid << "_SUB2PUB";
     Wparam.topic.topicName = pct.str();
     Wparam.qos.m_reliability.kind = RELIABLE_RELIABILITY_QOS;
@@ -296,7 +296,7 @@ ThroughputSubscriber::ThroughputSubscriber(bool reliable, uint32_t pid, bool hos
     std::ostringstream sct;
     sct << "ThroughputTest_Command_";
     if(hostname)
-        sct << boost::asio::ip::host_name() << "_";
+        sct << asio::ip::host_name() << "_";
     sct << pid << "_PUB2SUB";
     Rparam.topic.topicName = sct.str();
     Rparam.qos.m_reliability.kind = RELIABLE_RELIABILITY_QOS;
@@ -356,8 +356,3 @@ void ThroughputSubscriber::run()
     return;
 
 }
-
-
-
-
-

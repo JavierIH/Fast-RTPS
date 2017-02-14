@@ -31,9 +31,16 @@
 #include <list>
 #include <condition_variable>
 
+
+#if defined(_WIN32)
+#define GET_PID _getpid
+#else
+#define GET_PID getpid
+#endif
+
 using namespace eprosima::fastrtps;
 
-class ReqRepHelloWorldRequester 
+class ReqRepHelloWorldRequester
 {
     public:
 

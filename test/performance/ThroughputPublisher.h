@@ -20,7 +20,7 @@
 #ifndef THROUGHPUTPUBLISHER_H_
 #define THROUGHPUTPUBLISHER_H_
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 
 #include "ThroughputTypes.h"
 
