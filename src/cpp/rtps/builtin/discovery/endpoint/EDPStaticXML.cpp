@@ -68,22 +68,20 @@ bool EDPStaticXML::loadXMLFile(std::string& filename)
         doc.LoadFile(filename.c_str());
 
         tinyxml2::XMLNode* root = doc.FirstChildElement("staticdiscovery");
-
-        tinyxml2::XMLNode* xml_RTPSParticipant = root->FirstChildElement();
+        tinyxml2::XMLElement* xml_RTPSParticipant = root->FirstChildElement();
 
         while(xml_RTPSParticipant != nullptr)
         {
-            tinyxml2::XMLElement *element = xml_RTPSParticipant->FirstChildElement();
-            std::string key(element->Name());
+            std::string key(xml_RTPSParticipant->Name());
 
             if(key == "participant")
-        {
-            StaticRTPSParticipantInfo* pdata= new StaticRTPSParticipantInfo();
-                        loadXMLParticipantEndpoint(element, pdata);
-            m_RTPSParticipants.push_back(pdata);
-        }
+            {
+                StaticRTPSParticipantInfo* pdata= new StaticRTPSParticipantInfo();
+                loadXMLParticipantEndpoint(xml_RTPSParticipant, pdata);
+                m_RTPSParticipants.push_back(pdata);
+            }
 
-            xml_RTPSParticipant = xml_RTPSParticipant->NextSibling();
+            xml_RTPSParticipant = xml_RTPSParticipant->NextSiblingElement();
 
         }
 
@@ -94,10 +92,10 @@ bool EDPStaticXML::loadXMLFile(std::string& filename)
 void EDPStaticXML::loadXMLParticipantEndpoint(tinyxml2::XMLElement* xml_endpoint, StaticRTPSParticipantInfo* pdata)
 {
         tinyxml2::XMLNode* xml_RTPSParticipant_child = xml_endpoint;
+        tinyxml2::XMLElement* element = xml_RTPSParticipant_child->FirstChildElement();
 
-        while(xml_RTPSParticipant_child != nullptr)
+        while(element != nullptr)
         {
-            tinyxml2::XMLElement* element = xml_RTPSParticipant_child->FirstChildElement();
             std::string key(element->Name());
 
             if(key == "name") {
@@ -116,7 +114,7 @@ void EDPStaticXML::loadXMLParticipantEndpoint(tinyxml2::XMLElement* xml_endpoint
               logError(RTPS_EDP,"Unknown XMK tag: " << key);
             }
 
-            xml_RTPSParticipant_child = xml_RTPSParticipant_child->NextSibling();
+            element = element->NextSiblingElement();
         }
 }
 
@@ -125,10 +123,10 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
     ReaderProxyData* rdata = new ReaderProxyData();
 
         tinyxml2::XMLNode* xml_endpoint_child = xml_endpoint;
+        tinyxml2::XMLElement* element = xml_endpoint_child->FirstChildElement();
 
-        while(xml_endpoint_child != nullptr)
+        while(element != nullptr)
         {
-            tinyxml2::XMLElement* element = xml_endpoint_child->FirstChildElement();
             std::string key(element->Name());
 
         //cout << "READER ENDPOINT: " << key << endl;
@@ -156,7 +154,7 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
             octet* c = (octet*)&id;
             rdata->m_guid.entityId.value[2] = c[0];
             rdata->m_guid.entityId.value[1] = c[1];
-            rdata->m_guid.entityId.value[0] = c[2]; 
+            rdata->m_guid.entityId.value[0] = c[2];
         }
         else if(key == "expectsInlineQos")
         {
@@ -342,7 +340,7 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
             logWarning(RTPS_EDP,"Unkown Endpoint-XML tag, ignoring "<< key)
         }
 
-          xml_endpoint_child = xml_endpoint_child->NextSibling();
+        element = element->NextSiblingElement();
         }
     if(rdata->m_userDefinedId == 0)
     {
@@ -359,12 +357,12 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
 {
     WriterProxyData* wdata = new WriterProxyData();
 
-        tinyxml2::XMLNode* xml_endpoint_child = xml_endpoint;
+    tinyxml2::XMLNode* xml_endpoint_child = xml_endpoint;
+    tinyxml2::XMLElement* element = xml_endpoint_child->FirstChildElement();
 
-        while(xml_endpoint_child != nullptr)
+    while(element != nullptr)
     {
-            tinyxml2::XMLElement* element = xml_endpoint_child->FirstChildElement();
-            std::string key(element->Name());
+        std::string key(element->Name());
         if(key == "userId")
         {
             int16_t id = std::strtol(element->GetText(), nullptr, 10);
@@ -388,7 +386,7 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
             octet* c = (octet*)&id;
             wdata->guid().entityId.value[2] = c[0];
             wdata->guid().entityId.value[1] = c[1];
-            wdata->guid().entityId.value[0] = c[2]; 
+            wdata->guid().entityId.value[0] = c[2];
         }
         else if(key == "expectsInlineQos")
         {
@@ -425,9 +423,9 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
         {
             std::string auxString = std::string(element->GetText());
             if(auxString == "RELIABLE_RELIABILITY_QOS")
-                wdata->m_qos.m_reliability.kind = RELIABLE_RELIABILITY_QOS;
+            wdata->m_qos.m_reliability.kind = RELIABLE_RELIABILITY_QOS;
             else if (auxString == "BEST_EFFORT_RELIABILITY_QOS")
-                wdata->m_qos.m_reliability.kind = BEST_EFFORT_RELIABILITY_QOS;
+            wdata->m_qos.m_reliability.kind = BEST_EFFORT_RELIABILITY_QOS;
             else
             {
                 logError(RTPS_EDP,"Bad XML file, endpoint of stateKind: " << auxString << " is not valid");
@@ -492,9 +490,9 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
         {
             std::string auxstring = std::string(element->GetText());
             if(auxstring == "TRANSIENT_LOCAL_DURABILITY_QOS")
-                wdata->m_qos.m_durability.kind = TRANSIENT_LOCAL_DURABILITY_QOS;
+            wdata->m_qos.m_durability.kind = TRANSIENT_LOCAL_DURABILITY_QOS;
             else if(auxstring == "VOLATILE_DURABILITY_QOS")
-                wdata->m_qos.m_durability.kind = VOLATILE_DURABILITY_QOS;
+            wdata->m_qos.m_durability.kind = VOLATILE_DURABILITY_QOS;
             else
             {
                 logError(RTPS_EDP,"Bad XML file, durability of kind: " << auxstring << " is not valid");
@@ -506,9 +504,9 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
             const char * kind = element->Attribute("kind");
             std::string auxstring(kind ? kind : "OWNERHSIP kind NOT PRESENT");
             if(auxstring == "SHARED_OWNERSHIP_QOS")
-                wdata->m_qos.m_ownership.kind = SHARED_OWNERSHIP_QOS;
+            wdata->m_qos.m_ownership.kind = SHARED_OWNERSHIP_QOS;
             else if(auxstring == "EXCLUSIVE_OWNERSHIP_QOS")
-                wdata->m_qos.m_ownership.kind = EXCLUSIVE_OWNERSHIP_QOS;
+            wdata->m_qos.m_ownership.kind = EXCLUSIVE_OWNERSHIP_QOS;
             else
             {
                 logError(RTPS_EDP,"Bad XML file, ownership of kind: " << auxstring << " is not valid");
@@ -527,11 +525,11 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
             const char * kind = element->Attribute("kind");
             std::string auxstring(kind ? kind : "LIVELINESS kind NOT PRESENT");
             if(auxstring == "AUTOMATIC_LIVELINESS_QOS")
-                wdata->m_qos.m_liveliness.kind = AUTOMATIC_LIVELINESS_QOS;
+            wdata->m_qos.m_liveliness.kind = AUTOMATIC_LIVELINESS_QOS;
             else if(auxstring == "MANUAL_BY_PARTICIPANT_LIVELINESS_QOS")
-                wdata->m_qos.m_liveliness.kind = MANUAL_BY_PARTICIPANT_LIVELINESS_QOS;
+            wdata->m_qos.m_liveliness.kind = MANUAL_BY_PARTICIPANT_LIVELINESS_QOS;
             else if(auxstring == "MANUAL_BY_TOPIC_LIVELINESS_QOS")
-                wdata->m_qos.m_liveliness.kind = MANUAL_BY_TOPIC_LIVELINESS_QOS;
+            wdata->m_qos.m_liveliness.kind = MANUAL_BY_TOPIC_LIVELINESS_QOS;
             else
             {
                 logError(RTPS_EDP,"Bad XML file, liveliness of kind: " << auxstring << " is not valid");
@@ -540,7 +538,7 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
             const char * leaseDuration_ms = element->Attribute("leaseDuration_ms");
             auxstring = std::string(leaseDuration_ms ? leaseDuration_ms : "INF");
             if(auxstring == "INF")
-                wdata->m_qos.m_liveliness.lease_duration = c_TimeInfinite;
+            wdata->m_qos.m_liveliness.lease_duration = c_TimeInfinite;
             else
             {
                 try
@@ -548,7 +546,7 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
                     uint32_t milliseclease = std::strtoul(auxstring.c_str(), nullptr, 10);
                     wdata->m_qos.m_liveliness.lease_duration = TimeConv::MilliSeconds2Time_t((double)milliseclease);
                 }
-#pragma warning(disable: 4101)
+                #pragma warning(disable: 4101)
                 catch(std::exception &e)
                 {
                     logWarning(RTPS_EDP,"BAD XML:livelinessQos leaseDuration is a bad number: "<<auxstring<<" setting to INF");
@@ -560,7 +558,8 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
         {
             logWarning(RTPS_EDP,"Unkown Endpoint-XML tag, ignoring "<< key)
         }
-          xml_endpoint_child = xml_endpoint_child->NextSibling();
+
+        element = element->NextSiblingElement();
     }
     if(wdata->userDefinedId() == 0)
     {

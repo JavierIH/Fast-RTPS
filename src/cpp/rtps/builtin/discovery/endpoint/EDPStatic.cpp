@@ -59,7 +59,7 @@ bool EDPStatic::initEDP(BuiltinAttributes& attributes)
 	logInfo(RTPS_EDP,"Beginning STATIC EndpointDiscoveryProtocol");
 	m_attributes = attributes;
 	mp_edpXML = new EDPStaticXML();
-	std::string filename = std::string(m_attributes.getStaticEndpointXMLFilename());
+	std::string filename(m_attributes.getStaticEndpointXMLFilename());
 	return this->mp_edpXML->loadXMLFile(filename);
 }
 
