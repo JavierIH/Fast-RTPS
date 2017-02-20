@@ -101,17 +101,17 @@ void EDPStaticXML::loadXMLParticipantEndpoint(tinyxml2::XMLElement* xml_endpoint
             if(key == "name") {
                 pdata->m_RTPSParticipantName = element->GetText();
             } else if(key == "reader") {
-              if(!loadXMLReaderEndpoint(element, pdata))
-              {
-                logError(RTPS_EDP,"Reader Endpoint has error, ignoring");
-              }
+                if(!loadXMLReaderEndpoint(element, pdata))
+                {
+                    logError(RTPS_EDP,"Reader Endpoint has error, ignoring");
+                }
             } else if(key == "writer") {
-              if(!loadXMLWriterEndpoint(element, pdata))
-              {
-                logError(RTPS_EDP,"Writer Endpoint has error, ignoring");
-              }
+                if(!loadXMLWriterEndpoint(element, pdata))
+                {
+                    logError(RTPS_EDP,"Writer Endpoint has error, ignoring");
+                }
             } else {
-              logError(RTPS_EDP,"Unknown XMK tag: " << key);
+                logError(RTPS_EDP,"Unknown XMK tag: " << key);
             }
 
             element = element->NextSiblingElement();
@@ -122,18 +122,18 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
 {
     ReaderProxyData* rdata = new ReaderProxyData();
 
-        tinyxml2::XMLNode* xml_endpoint_child = xml_endpoint;
-        tinyxml2::XMLElement* element = xml_endpoint_child->FirstChildElement();
+    tinyxml2::XMLNode* xml_endpoint_child = xml_endpoint;
+    tinyxml2::XMLElement* element = xml_endpoint_child->FirstChildElement();
 
-        while(element != nullptr)
-        {
-            std::string key(element->Name());
+    while(element != nullptr)
+    {
+        std::string key(element->Name());
 
         //cout << "READER ENDPOINT: " << key << endl;
         if(key == "userId")
         {
             //cout << "USER ID FOUND";
-            int16_t id = std::strtol(element->GetText(), nullptr, 10);
+            int16_t id = static_cast<int16_t>(std::strtol(element->GetText(), nullptr, 10));
             if(id<=0 || m_endpointIds.insert(id).second == false)
             {
                 logError(RTPS_EDP,"Repeated or negative ID in XML file");
@@ -219,10 +219,10 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
         {
             Locator_t loc;
             loc.kind = 1;
-                        const char *address = element->Attribute("address");
+            const char *address = element->Attribute("address");
             std::string auxString(address ? address : "");
             loc.set_IP4_address(auxString);
-                        int port = 0;
+            int port = 0;
             element->QueryIntAttribute("port", &port);
             loc.port = port;
             rdata->m_unicastLocatorList.push_back(loc);
@@ -231,19 +231,19 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
         {
             Locator_t loc;
             loc.kind = 1;
-                        const char *address = element->Attribute("address");
+            const char *address = element->Attribute("address");
             std::string auxString(address ? address : "");
             loc.set_IP4_address(auxString);
-                        int port = 0;
+            int port = 0;
             element->QueryIntAttribute("port", &port);
             loc.port = port;
             rdata->m_multicastLocatorList.push_back(loc);
         }
         else if(key == "topic")
         {
-                        const char *topicName = element->Attribute("name");
-                        const char *typeName = element->Attribute("dataType");
-                        const char *kind = element->Attribute("kind");
+            const char *topicName = element->Attribute("name");
+            const char *typeName = element->Attribute("dataType");
+            const char *kind = element->Attribute("kind");
 
             rdata->m_topicName = topicName ? std::string(topicName) : std::string("");
             rdata->m_typeName = typeName ? std::string(typeName) : std::string("");
@@ -285,7 +285,7 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
         }
         else if(key == "ownershipQos")
         {
-                        const char *ownership = element->Attribute("kind");
+            const char *ownership = element->Attribute("kind");
             std::string auxstring(ownership ? ownership : "OWNERHSIP kind NOT PRESENT");
             if(auxstring == "SHARED_OWNERSHIP_QOS")
                 rdata->m_qos.m_ownership.kind = SHARED_OWNERSHIP_QOS;
@@ -303,8 +303,8 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
         }
         else if(key == "livelinessQos")
         {
-                        const char *kind = element->Attribute("kind");
-                        std::string auxstring(kind ? kind : "LIVELINESS kind NOT PRESENT");
+            const char *kind = element->Attribute("kind");
+            std::string auxstring(kind ? kind : "LIVELINESS kind NOT PRESENT");
             if(auxstring == "AUTOMATIC_LIVELINESS_QOS")
                 rdata->m_qos.m_liveliness.kind = AUTOMATIC_LIVELINESS_QOS;
             else if(auxstring == "MANUAL_BY_PARTICIPANT_LIVELINESS_QOS")
@@ -316,7 +316,7 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
                 logError(RTPS_EDP,"Bad XML file, liveliness of kind: " << auxstring << " is not valid");
                 delete(rdata);return false;
             }
-                        const char *leaseDuration_ms = element->Attribute("leaseDuration_ms");
+            const char *leaseDuration_ms = element->Attribute("leaseDuration_ms");
             auxstring = std::string(leaseDuration_ms ? leaseDuration_ms : "INF");
             if(auxstring == "INF")
                 rdata->m_qos.m_liveliness.lease_duration = c_TimeInfinite;
@@ -365,7 +365,7 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
         std::string key(element->Name());
         if(key == "userId")
         {
-            int16_t id = std::strtol(element->GetText(), nullptr, 10);
+            int16_t id = static_cast<int16_t>(std::strtol(element->GetText(), nullptr, 10));
             if(id<=0 || m_endpointIds.insert(id).second == false)
             {
                 logError(RTPS_EDP,"Repeated or negative ID in XML file");

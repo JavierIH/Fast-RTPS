@@ -26,9 +26,6 @@
 #include <fastrtps/attributes/SubscriberAttributes.h>
 
 #include "types/HelloWorldType.h"
-#include <string>
-#include <chrono>
-#include <thread>
 #include <fastrtps/rtps/RTPSDomain.h>
 
 #include <fastrtps/rtps/builtin/data/WriterProxyData.h>
@@ -40,6 +37,8 @@
 
 #include <gtest/gtest.h>
 
+#include <string>
+#include <map>
 #include <mutex>
 #include <chrono>
 #include <thread>
@@ -47,6 +46,7 @@
 
 
 #if defined(_WIN32)
+#include <process.h>
 #define GET_PID _getpid
 #else
 #define GET_PID getpid

@@ -396,9 +396,9 @@ TEST(TimedEvent, EventNonAutoDestruc_AutoRestartAndDeleteRandomly)
     // Restart destriction counter.
     MockEvent::destructed_ = 0;
 
-    std::mt19937 rng(static_cast<uint32_t>(std::time(nullptr)));
+    boost::mt19937 rng(static_cast<uint32_t>(std::time(nullptr)));
     boost::uniform_int<> range(10, 100);
-    boost::variate_generator<std::mt19937, boost::uniform_int<>> random(rng, range);
+    boost::variate_generator<boost::mt19937, boost::uniform_int<>> random(rng, range);
 
     MockEvent* event = new MockEvent(env->service_, *env->thread_, 2, true);
 

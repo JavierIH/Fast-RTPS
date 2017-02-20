@@ -42,6 +42,7 @@
 
 
 #if defined(_WIN32)
+#include <process.h>
 #define GET_PID _getpid
 #else
 #define GET_PID getpid
