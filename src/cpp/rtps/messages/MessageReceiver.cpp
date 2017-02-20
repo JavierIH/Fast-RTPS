@@ -19,8 +19,6 @@
 
 #include <fastrtps/rtps/messages/MessageReceiver.h>
 
-#include <fastrtps/rtps/resources/ListenResource.h>
-
 #include <fastrtps/rtps/writer/StatefulWriter.h>
 #include <fastrtps/rtps/reader/StatefulReader.h>
 
@@ -84,7 +82,7 @@ MessageReceiver::~MessageReceiver()
 }
 
 void MessageReceiver::associateEndpoint(Endpoint *to_add){
-	bool found = false;	
+	bool found = false;
 	std::lock_guard<std::mutex> guard(mtx);
 	if(to_add->getAttributes()->endpointKind == WRITER){
 		for(auto it = AssociatedWriters.begin();it != AssociatedWriters.end(); ++it){
@@ -93,7 +91,7 @@ void MessageReceiver::associateEndpoint(Endpoint *to_add){
 				break;
 			}
 		}
-		if(!found)	AssociatedWriters.push_back((RTPSWriter*)to_add);	
+		if(!found)	AssociatedWriters.push_back((RTPSWriter*)to_add);
 	}else{
 		for(auto it = AssociatedReaders.begin();it != AssociatedReaders.end(); ++it){
 			if( (*it) == (RTPSReader*)to_add ){
@@ -114,7 +112,7 @@ void MessageReceiver::removeEndpoint(Endpoint *to_remove){
 			if ((*it) == var){
 				AssociatedWriters.erase(it);
 				break;
-			}		
+			}
 		}
 	}else{
 		RTPSReader *var = (RTPSReader *)to_remove;
@@ -122,7 +120,7 @@ void MessageReceiver::removeEndpoint(Endpoint *to_remove){
 			if ((*it) == var){
 				AssociatedReaders.erase(it);
 				break;
-			}		
+			}
 		}
 	}
 	return;
@@ -604,7 +602,7 @@ bool MessageReceiver::proc_Submsg_DataFrag(CDRMessage_t* msg, SubmessageHeader_t
 		logInfo(RTPS_MSG_IN, IDSTRING"Too short submessage received, ignoring");
 		return false;
 	}
-	
+
 	//Fill flags bool values
 	bool endiannessFlag = smh->flags & BIT(0) ? true : false;
 	bool inlineQosFlag = smh->flags & BIT(1) ? true : false;
@@ -655,7 +653,7 @@ bool MessageReceiver::proc_Submsg_DataFrag(CDRMessage_t* msg, SubmessageHeader_t
 	CacheChange_t* ch = mp_change;
 	ch->writerGUID.guidPrefix = sourceGuidPrefix;
 	CDRMessage::readEntityId(msg, &ch->writerGUID.entityId);
-	
+
 	//Get sequence number
 	CDRMessage::readSequenceNumber(msg, &ch->sequenceNumber);
 
@@ -736,7 +734,7 @@ bool MessageReceiver::proc_Submsg_DataFrag(CDRMessage_t* msg, SubmessageHeader_t
 			ch->setFragmentSize(fragmentSize);
 			ch->getDataFragments()->clear();
 			ch->getDataFragments()->resize(fragmentsInSubmessage, ChangeFragmentStatus_t::PRESENT);
-			
+
 			CDRMessage::readData(msg,
 				ch->serializedPayload.data, payload_size);
 
@@ -880,7 +878,7 @@ bool MessageReceiver::proc_Submsg_Acknack(CDRMessage_t* msg,SubmessageHeader_t* 
 			if((*it)->getAttributes()->reliabilityKind == RELIABLE)
 			{
 				StatefulWriter* SF = (StatefulWriter*)(*it);
-				
+
 				for(auto rit = SF->matchedReadersBegin();rit!=SF->matchedReadersEnd();++rit)
 				{
                     std::lock_guard<std::recursive_mutex> guardReaderProxy(*(*rit)->mp_mutex);
@@ -1046,7 +1044,7 @@ bool MessageReceiver::proc_Submsg_InfoSRC(CDRMessage_t* msg,SubmessageHeader_t* 
 }
 
 bool MessageReceiver::proc_Submsg_NackFrag(CDRMessage_t*msg, SubmessageHeader_t* smh, bool*last) {
-	
+
 
 	bool endiannessFlag = smh->flags & BIT(0) ? true : false;
 	//Assign message endianness
