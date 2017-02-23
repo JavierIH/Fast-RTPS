@@ -15,7 +15,7 @@
 #include "mock/MockEvent.h"
 #include "mock/MockParentEvent.h"
 #include <thread>
-#include <boost/random.hpp>
+#include <random>
 #include <gtest/gtest.h>
 
 class TimedEventEnvironment : public ::testing::Environment
@@ -396,14 +396,14 @@ TEST(TimedEvent, EventNonAutoDestruc_AutoRestartAndDeleteRandomly)
     // Restart destriction counter.
     MockEvent::destructed_ = 0;
 
-    boost::mt19937 rng(static_cast<uint32_t>(std::time(nullptr)));
-    boost::uniform_int<> range(10, 100);
-    boost::variate_generator<boost::mt19937, boost::uniform_int<>> random(rng, range);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(10, 100);
 
     MockEvent* event = new MockEvent(env->service_, *env->thread_, 2, true);
 
     event->restart_timer();
-    std::this_thread::sleep_for(std::chrono::milliseconds(random()));
+    std::this_thread::sleep_for(std::chrono::milliseconds(dis(gen)));
 
     delete event;
 

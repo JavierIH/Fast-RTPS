@@ -17,8 +17,6 @@
 #include <fastrtps/rtps/resources/AsyncWriterThread.h>
 #include <asio.hpp>
 
-using namespace std;
-using namespace asio;
 
 namespace eprosima{
 namespace fastrtps{
@@ -42,7 +40,7 @@ ThroughputController::ThroughputController(const ThroughputControllerDescriptor&
 {
 }
 
-void ThroughputController::operator()(vector<CacheChangeForGroup_t>& changes)
+void ThroughputController::operator()(std::vector<CacheChangeForGroup_t>& changes)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mThroughputControllerMutex);
 
@@ -53,7 +51,7 @@ void ThroughputController::operator()(vector<CacheChangeForGroup_t>& changes)
         auto& change = changes[clearedChanges];
         if (change.isFragmented())
         {
-            unsigned int fittingFragments = min((mBytesPerPeriod - mAccumulatedPayloadSize) / change.getChange()->getFragmentSize(),
+            unsigned int fittingFragments = std::min((mBytesPerPeriod - mAccumulatedPayloadSize) / change.getChange()->getFragmentSize(),
                     static_cast<uint32_t>(change.getFragmentsClearedForSending().set.size()));
 
             if (fittingFragments)
@@ -92,7 +90,7 @@ void ThroughputController::operator()(vector<CacheChangeForGroup_t>& changes)
 
 void ThroughputController::ScheduleRefresh(uint32_t sizeToRestore)
 {
-    shared_ptr<steady_timer> throwawayTimer(make_shared<steady_timer>(*FlowController::ControllerService));
+    std::shared_ptr<asio::steady_timer> throwawayTimer(std::make_shared<asio::steady_timer>(*FlowController::ControllerService));
     auto refresh = [throwawayTimer, this, sizeToRestore]
         (const asio::error_code& error)
         {
