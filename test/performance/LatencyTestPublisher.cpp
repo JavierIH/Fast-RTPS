@@ -563,31 +563,31 @@ void LatencyTestPublisher::analizeTimes(uint32_t datasize)
 		auxstdev += pow(((*tit).count() - TS.mean), 2);
 	}
 	auxstdev = sqrt(auxstdev / times_.size());
-	TS.stdev = (double)round(auxstdev);
+	TS.stdev = static_cast<double>(round(auxstdev));
 
 	std::sort(times_.begin(), times_.end());
-	size_t elem;
+	size_t elem = 0;
 
-	elem = (size_t)(times_.size() * 0.5);
-    if(elem >  0 && elem <= times_.size())
+	elem = static_cast<size_t>(times_.size() * 0.5);
+    if(elem > 0 && elem <= times_.size())
         TS.p50 = times_.at(--elem).count();
     else
         TS.p50 = NAN;
 
-     elem = (size_t)times_.size() * 0.9;
-    if(elem >  0 && elem <= times_.size())
+    elem = static_cast<size_t>(times_.size() * 0.9);
+    if(elem > 0 && elem <= times_.size())
         TS.p90 = times_.at(--elem).count();
     else
         TS.p90 = NAN;
 
-     elem = (size_t)times_.size() * 0.99;
-    if(elem >  0 && elem <= times_.size())
+    elem = static_cast<size_t>(times_.size() * 0.99);
+    if(elem > 0 && elem <= times_.size())
         TS.p99 = times_.at(--elem).count();
     else
         TS.p99 = NAN;
 
-     elem = (size_t)times_.size() * 0.9999;
-    if(elem >  0 && elem <= times_.size())
+    elem = static_cast<size_t>(times_.size() * 0.9999);
+    if(elem > 0 && elem <= times_.size())
         TS.p9999 = times_.at(--elem).count();
     else
         TS.p9999 = NAN;
@@ -640,7 +640,7 @@ void LatencyTestPublisher::printStat(TimeStats& TS)
 		break;
 	}
 
-	printf("%8lu,%8u,%8.2f,%8.2f,%8.2f,%8.2f,%8.2f,%8.2f,%8.2f,%8.2f \n",
+	printf("%8llu,%8u,%8.2f,%8.2f,%8.2f,%8.2f,%8.2f,%8.2f,%8.2f,%8.2f \n",
 			TS.nbytes, TS.received, TS.stdev, TS.mean,
 			TS.m_min.count(),
 			TS.p50, TS.p90, TS.p99, TS.p9999,

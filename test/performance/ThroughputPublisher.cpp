@@ -427,8 +427,8 @@ bool ThroughputPublisher::loadDemandsPayload()
             if(end == std::string::npos)
             {
                 more = false;
-                std::istringstream iss(line.substr(start,end-start));
-                if(iss >> demand)
+                std::istringstream n_iss(line.substr(start,end-start));
+                if(n_iss >> demand)
                     m_demand_payload[payload].push_back(demand);
             }
         }

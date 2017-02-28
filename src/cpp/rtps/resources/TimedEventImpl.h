@@ -57,7 +57,7 @@ namespace eprosima
              * All timedEvents must be a specification of this class, implementing the event method.
              *@ingroup MANAGEMENT_MODULE
              */
-            class TimedEventImpl 
+            class TimedEventImpl
             {
                 public:
 
@@ -119,7 +119,7 @@ namespace eprosima
                     double getIntervalMsec()
                     {
                         auto total_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(m_interval_microsec);
-                        return total_milliseconds.count();
+                        return static_cast<double>(total_milliseconds.count());
                     }
 
                     /**
@@ -129,7 +129,7 @@ namespace eprosima
                     double getRemainingTimeMilliSec()
                     {
                         std::unique_lock<std::mutex> lock(mutex_);
-                        return std::chrono::duration_cast<std::chrono::milliseconds>(timer_.expires_from_now()).count();
+                        return static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(timer_.expires_from_now()).count());
                     }
 
                 private:
