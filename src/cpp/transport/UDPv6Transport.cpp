@@ -347,10 +347,10 @@ bool UDPv6Transport::OpenAndBindOutputSockets(Locator_t& locator)
             mOutputSockets[locator.port].push_back(SocketInfo(unicastSocket));
         }
     }
-    catch (asio::error_code const& e)
+    catch (asio::system_error const& e)
     {
         (void)e;
-        logInfo(RTPS_MSG_OUT, "UDPv6 Error binding at port: (" << locator.port << ")" << " with msg: "<<e.message());
+        logInfo(RTPS_MSG_OUT, "UDPv6 Error binding at port: (" << locator.port << ")" << " with msg: "<<e.what());
         mOutputSockets.erase(locator.port);
         return false;
     }
