@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <chrono>
-#include <thread>
 
 #include "deadlineQoS.h"
 #include <string>
@@ -27,7 +26,7 @@ void deadlineQoS::callback()
 	mapmtx.lock();
 	std::cout << "Map holds " << deadlineQoSmap.size() << " different keys" << std::endl;
 	for(auto it = deadlineQoSmap.begin(); it != deadlineQoSmap.end(); it++){
-		
+
 		if(it->second == false){
 			std::cout << "Deadline QoS on key index ";
 			for(int i=0;i<16;i++){
@@ -79,14 +78,16 @@ void deadlineQoS::init(){
 
 void deadlineQoS::runner(){
 		wait();
+
 		io.run();
 }
 
 void deadlineQoS::run(){
-		std::thread dlqos(std::bind(&deadlineQoS::runner,this));
+	dlqos = new std::thread(std::bind(&deadlineQoS::runner,this));
 }
 
 void deadlineQoS::stop(){
 	t.cancel();
 	io.stop();
+	dlqos->join();
 }

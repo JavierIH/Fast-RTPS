@@ -35,6 +35,7 @@
 #include "mapableKey.h"
 #include <iostream>
 #include <map>
+#include <thread>
 
 using namespace asio;
 using namespace eprosima;
@@ -46,9 +47,12 @@ class deadlineQoS
 		deadlineQoS(steady_timer &timer, io_service &ioserv): t(timer),io(ioserv){
 			init();
 		}
+		~deadlineQoS(){
+			delete dlqos;
+		}
 		void callback();
 		void setFlag(mapable_key target);
-		
+
 		void run();
 		void stop();
 		//deadlineQoS_struct deadlineQoSlist[32];
@@ -57,6 +61,7 @@ class deadlineQoS
 	private:
 		steady_timer &t;
 		io_service &io;
+		std::thread* dlqos;
 		void runner();
 		void init();
 		void wait();
