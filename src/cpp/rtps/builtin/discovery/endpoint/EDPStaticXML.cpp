@@ -322,16 +322,10 @@ bool EDPStaticXML::loadXMLReaderEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
                 rdata->m_qos.m_liveliness.lease_duration = c_TimeInfinite;
             else
             {
-                try
-                {
-                    uint32_t milliseclease = std::strtoul(auxstring.c_str(), nullptr, 10);
-                    rdata->m_qos.m_liveliness.lease_duration = TimeConv::MilliSeconds2Time_t((double)milliseclease);
-                }
-#pragma warning(disable: 4101)
-                catch(std::exception &e)
-                {
-                    logWarning(RTPS_EDP,"BAD XML:livelinessQos leaseDuration is a bad number: "<<auxstring<<" setting to INF");
-                    rdata->m_qos.m_liveliness.lease_duration = c_TimeInfinite;
+                uint32_t milliseclease = std::strtoul(auxstring.c_str(), nullptr, 10);
+                rdata->m_qos.m_liveliness.lease_duration = TimeConv::MilliSeconds2Time_t((double)milliseclease);
+                if(milliseclease == 0){
+                    logWarning(RTPS_EDP,"BAD XML:livelinessQos leaseDuration is 0");
                 }
             }
         }
@@ -541,16 +535,10 @@ bool EDPStaticXML::loadXMLWriterEndpoint(tinyxml2::XMLElement* xml_endpoint, Sta
             wdata->m_qos.m_liveliness.lease_duration = c_TimeInfinite;
             else
             {
-                try
-                {
-                    uint32_t milliseclease = std::strtoul(auxstring.c_str(), nullptr, 10);
-                    wdata->m_qos.m_liveliness.lease_duration = TimeConv::MilliSeconds2Time_t((double)milliseclease);
-                }
-                #pragma warning(disable: 4101)
-                catch(std::exception &e)
-                {
-                    logWarning(RTPS_EDP,"BAD XML:livelinessQos leaseDuration is a bad number: "<<auxstring<<" setting to INF");
-                    wdata->m_qos.m_liveliness.lease_duration = c_TimeInfinite;
+                uint32_t milliseclease = std::strtoul(auxstring.c_str(), nullptr, 10);
+                wdata->m_qos.m_liveliness.lease_duration = TimeConv::MilliSeconds2Time_t((double)milliseclease);
+                if(milliseclease == 0){
+                    logWarning(RTPS_EDP,"BAD XML:livelinessQos leaseDuration is 0");
                 }
             }
         }
